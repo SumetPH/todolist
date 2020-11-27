@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 
 function Nav({ fetchTodoList }) {
   const sidenav = useRef();
-  const modal = useRef();
+  const addModal = useRef();
   const textarea = useRef();
   const [text, setText] = useState("test");
 
@@ -13,11 +13,12 @@ function Nav({ fetchTodoList }) {
 
   const addFunc = (e) => {
     e.preventDefault();
-    window.M.Modal.init(modal.current).open();
+    window.M.Modal.init(addModal.current).open();
     window.M.Sidenav.init(sidenav.current).close();
   };
 
   const addSave = (e) => {
+    e.preventDefault();
     let todolist = JSON.parse(localStorage.getItem("todolist"));
     if (todolist) {
       todolist.push({
@@ -28,6 +29,7 @@ function Nav({ fetchTodoList }) {
     } else {
       todolist = [{ id: Date.now(), text: text, checked: false }];
     }
+    window.M.Modal.init(addModal.current).close();
     localStorage.setItem("todolist", JSON.stringify(todolist));
     fetchTodoList();
     textarea.current.value = "";
@@ -70,32 +72,31 @@ function Nav({ fetchTodoList }) {
       </ul>
 
       {/* add modal */}
-      <div id="modal1" className="modal" ref={modal}>
-        <div className="modal-content">
-          <div className="row">
-            <form className="col s12">
-              <div className="input-field col s12">
-                <textarea
-                  id="textarea1"
-                  className="materialize-textarea"
-                  ref={textarea}
-                  onChange={(e) => setText(e.target.value)}
-                ></textarea>
-                <label htmlFor="textarea1">รายละเอียด</label>
+      <form onSubmit={addSave}>
+        <div id="modal1" className="modal" ref={addModal}>
+          <div className="modal-content">
+            <div className="row">
+              <div className="col s12">
+                <div className="input-field col s12">
+                  <textarea
+                    id="textarea1"
+                    className="materialize-textarea"
+                    ref={textarea}
+                    onChange={(e) => setText(e.target.value)}
+                    required
+                  ></textarea>
+                  <label htmlFor="textarea1">รายละเอียด</label>
+                </div>
               </div>
-            </form>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="waves-effect waves-green btn-flat" type="submit">
+              บันทึก
+            </button>
           </div>
         </div>
-        <div className="modal-footer">
-          <a
-            href="#!"
-            className="modal-close waves-effect waves-green btn-flat"
-            onClick={addSave}
-          >
-            บันทึก
-          </a>
-        </div>
-      </div>
+      </form>
     </div>
   );
 }

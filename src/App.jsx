@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Nav from "./components/Nav";
 
 function App() {
-  const modal = useRef();
+  const editModal = useRef();
   const textarea = useRef();
   const [text, setText] = useState("");
   const [textIndex, setTextIndex] = useState(null);
@@ -34,13 +34,15 @@ function App() {
     await setText(todolist[index].text);
     await setTextIndex(index);
     await window.M.updateTextFields();
-    await window.M.Modal.init(modal.current).open();
+    await window.M.Modal.init(editModal.current).open();
   };
 
-  const editSave = () => {
+  const editSave = (e) => {
+    e.preventDefault();
     const t = todolist;
     t[textIndex].text = text;
     setTodolist([...t]);
+    window.M.Modal.init(editModal.current).close();
     localStorage.setItem("todolist", JSON.stringify(t));
   };
 
@@ -144,33 +146,32 @@ function App() {
       </div>
 
       {/* edit modal */}
-      <div id="modal2" className="modal" ref={modal}>
-        <div className="modal-content">
-          <div className="row">
-            <form className="col s12">
-              <div className="input-field col s12">
-                <textarea
-                  id="textarea2"
-                  className="materialize-textarea"
-                  ref={textarea}
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                ></textarea>
-                <label htmlFor="textarea1">รายละเอียด</label>
+      <form onSubmit={editSave}>
+        <div id="modal2" className="modal" ref={editModal}>
+          <div className="modal-content">
+            <div className="row">
+              <div className="col s12">
+                <div className="input-field col s12">
+                  <textarea
+                    id="textarea2"
+                    className="materialize-textarea"
+                    ref={textarea}
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    required
+                  ></textarea>
+                  <label htmlFor="textarea1">รายละเอียด</label>
+                </div>
               </div>
-            </form>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="submit" className="waves-effect waves-green btn-flat">
+              บันทึก
+            </button>
           </div>
         </div>
-        <div className="modal-footer">
-          <a
-            href="#!"
-            className="modal-close waves-effect waves-green btn-flat"
-            onClick={editSave}
-          >
-            บันทึก
-          </a>
-        </div>
-      </div>
+      </form>
     </div>
   );
 }
